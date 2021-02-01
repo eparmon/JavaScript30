@@ -114,12 +114,24 @@
 
         function addSecond() {
             secondsDegrees += degreesInCircle / secondsInCircle;
-            if (secondsDegrees % degreesInCircle === initialOffset) {
+            if (isNewMinute()) {
                 minuteDegrees += degreesInCircle / minutesInCircle;
-                if (minuteDegrees % degreesInCircle === initialOffset) {
+                if (isNewHour()) {
                     hourDegrees += degreesInCircle / hoursInCircle;   
                 }    
             }
+            rotate();
+        }
+
+        function isNewMinute() {
+            return secondsDegrees % degreesInCircle === initialOffset;
+        }
+
+        function isNewHour() {
+            return minuteDegrees % degreesInCircle === initialOffset;
+        }
+
+        function rotate() {
             secondHand.style.transform = `rotate(${secondsDegrees}deg)`;
             minuteHand.style.transform = `rotate(${minuteDegrees}deg)`;
             hourHand.style.transform = `rotate(${hourDegrees}deg)`;
