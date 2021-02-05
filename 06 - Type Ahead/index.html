@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Type Ahead 👀</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <form class="search-form">
+        <input type="text" class="search" placeholder="City or State">
+        <ul class="suggestions">
+            <li>Filter for a city</li>
+            <li>or a state</li>
+        </ul>
+    </form>
+    <script>
+        let places;
+        fetch('https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json')
+            .then(response => response.json())
+            .then(data => places = data);
+        const searchInput = getSearchInput();
+        const suggestions = getSuggestionsElement();
+        searchInput.addEventListener('keyup', e => displayMatches(e, places));
+
+        function getSearchInput() {
+            return document.querySelector('.search');
+        }
+
+        function getSuggestionsElement() {
+            return document.querySelector('.suggestions');
+        }
+
+        function displayMatches(e, places) {
+            const input = e.target.value;
+            suggestions.innerHTML = findMatches(input)
+                .map(place => buildPlaceHtml(place, input))
+                .join('');
+        }
+
+        function buildPlaceHtml(place, input) {
+            return `
+                <li>
+                    <span class="name">${highlightSelection(place.city, input)}, ${highlightSelection(place.state, input)}</span>
+                    <span class="population">${place.population.replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</span>
+                </li>
+            `
+        }
+
+        function findMatches(input) {
+            const regex = getRegexIncludingSelection(input);
+            return places.filter(place => place.city.match(regex) || place.state.match(regex))
+        }
+
+        function highlightSelection(text, selection) {
+            const regex = getRegexIncludingSelection(selection);
+            return text.replace(regex, `<span class="hl">${selection}</span>`);
+        }
+
+        function getRegexIncludingSelection(selection) {
+            return new RegExp(selection, 'gi');
+        }
+
+    </script>
+</body>
+
+</html>
